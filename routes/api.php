@@ -24,7 +24,7 @@ Route::post('/user/profile/update','userController@profile_update');
 Route::get('/user/profile/destroy','userController@destroy');
 Route::post('/user/profile/save-user','userController@save_user');
 Route::get('/user/is_block','userController@is_block');
-Route::get('/user/push_notification/{id}','userController@push_notification');
+Route::post('/user/push_notification/{id}','userController@push_notification');
 
 // country module route
 

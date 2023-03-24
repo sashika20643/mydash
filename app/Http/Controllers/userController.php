@@ -11,8 +11,10 @@ use PHPUnit\Framework\Constraint\JsonMatches;
 use Kreait\Laravel\Firebase\Facades\Firebase;
 use Kreait\Firebase\Auth;
 use Kreait\Firebase\Factory;
+use App\User;
 
-
+use Illuminate\Foundation\Auth\ThrottlesLogins;
+use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 use Kreait\Firebase\ServiceAccount;
 use Google\Cloud\Logging\LoggingClient;
 use Kreait\Firebase\Messaging\CloudMessage;
@@ -30,7 +32,7 @@ class userController extends Controller
                 'username' => 'required',
                 'identity' => 'required',
                 'country' => 'required',
-                'role_id' => 'required',
+                'role' => 'required',
                 'password' => 'required',
                 'phone_number' => 'required'
             ]);
@@ -65,25 +67,37 @@ class userController extends Controller
                 $data['name'] = $request->name;
                 $data['username'] = $request->username;
                 $data['identity'] = $request->identity;
-                $data['fcm_token'] = $request->fcmtoken;
+                // $data['fcm_token'] = $request->fcmtoken;
                 $data['country'] = $request->country;
-                $data['age'] = $request->age;
-                $data['city'] = $request->city;
-                $data['role_id'] = $request->role_id;
-                $data['isHost'] = 0;
+                // $data['age'] = $request->age;
+                // $data['city'] = $request->city;
+                $data['role'] = $request->role;
+                // $data['isHost'] = 0;
                 $data['phone_number'] = $request->phone_number;
                 $data['password'] = Hash::make($request->password);
                 $data['show_password'] = $request->password;
-                $data['coin'] = $settings->login_bonus;
-                $data['rate'] = '';
+                // $data['coin'] = $settings->login_bonus;
+                // $data['rate'] = '';
 
-                $id =  DB::table('users')->insertGetId($data);
+             $user=User::create([
+                    'name' => $data['name'],
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                    'image'=>$final_url,
+                    'username'=>$data['username'],
+                    'phone_number'=>$request->phone_number,
+                    'identity'=>$request->identity,
+                    'country'=>$request->country,
+                    'role_id'=>$data['role'],
+                    'show_password'=>$request->password
 
-                $user = DB::table('users')->where('id', $id)->first();
+                ]);
 
 
+
+                \Auth::loginUsingId($user->id);
                 if ($request->device == 'web') {
-                    return redirect('/home');
+                    return redirect('/');
                 } else {
                     return response()->json(['status' => true, 'message' => "success", $user]);
                 }
@@ -106,7 +120,8 @@ $status=[];
             ->withServiceAccount(__DIR__.'/middle-age-cam-live-firebase-adminsdk-nb9vu-7dc4c4f218.json');
                 $auth = $factory->createAuth();
                 // return  $document->data()['uid'];
-     if(   $userd = $auth->getUser($document->data()['uid'])){
+                try {
+      $userd = $auth->getUser($document->data()['uid']);
 if($userd->disabled){
     array_push($status,1);
 }
@@ -114,9 +129,18 @@ else{
     array_push($status,0);
 }
      }
-            array_push($user, $document->data());
 
+
+
+        catch (NoUserExists $e) {
+            array_push($status, -1);
         }
+        array_push($user, $document->data());
+    }
+
+
+
+
         // return $status;
         // $user = DB::table('users')->where([['status', '=', 1], ['name', '!=', 'admin']]);
         return view('user.index', compact('user','status'));
@@ -238,8 +262,9 @@ else{
         }
     }
 
-    public function push_notification($id)
+    public function push_notification(Request $request,$id)
     {
+
         $user_doc = app('firebase.firestore')
         ->database()
         ->collection('Users')
@@ -270,7 +295,7 @@ return "not found";
 
         // Send a notification to each user's FCM token
         $message = CloudMessage::withTarget('token', $token)
-            ->withNotification(Notification::create('Title', 'Message'));
+            ->withNotification(Notification::create($request->title, $request->body));
             // $messaging->send($message);
 
         try {

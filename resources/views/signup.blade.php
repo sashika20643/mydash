@@ -48,6 +48,10 @@
                                             <label><strong>Identity</strong></label>
                                             <input type="text" name="identity" class="form-control" required>
                                         </div>
+                                        <div class="form-group">
+                                            <label><strong>Email</strong></label>
+                                            <input type="email" name="email" class="form-control" required>
+                                        </div>
 
                                         <div class="form-group">
                                             <label><strong>Image</strong></label>
@@ -66,7 +70,7 @@
 
                                         <div class="form-group">
                                             <label><strong>Role</strong></label>
-                                            <select name="role_id" id="role_id" class="form-control">
+                                            <select name="role" id="role" class="form-control">
                                                 <option value="">Select Role</option>
                                                 @foreach ($role as $value)
                                                     <option value="{{ $value->id }}">{{ $value->name }}</option>
@@ -90,11 +94,15 @@
                                             <button type="submit" class="btn btn-primary btn-block">Sign me in</button>
                                         </div>
                                     </form>
+                                    @if($errors->any())
+    {{ implode('', $errors->all('<div>:message</div>')) }}
+@endif
                                     <div class="new-account mt-3">
                                         <p>Don't have an account? <a class="text-primary"
                                                 href="{{ url('/') }}/">Sign
                                                 In</a></p>
                                     </div>
+
                                 </div>
                             </div>
                         </div>

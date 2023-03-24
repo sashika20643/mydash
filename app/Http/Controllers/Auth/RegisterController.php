@@ -54,7 +54,13 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'min:8'],
+            'image'=>['required'],
+            'username'=>['required'],
+            'phone_number'=>['required'],
+            'identity'=>['required'],
+            'country'=>['required'],
+            'role'=>['required'],
         ]);
     }
 
@@ -65,18 +71,8 @@ class RegisterController extends Controller
      * @return \App\User
      */
     protected function create(array $data)
-    {
-        echo '<pre>';
-        print_r($data);
-        die;
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
 
-        $settings = DB::table('settings')->where('id', 1)->first();
-        $user = DB::table('users')->where('identity', $data['identity']);
+    {$final_url="";
 
         if ($files = $request->file('image')) {
             // Define upload path
@@ -88,28 +84,22 @@ class RegisterController extends Controller
 
             $final_url = url('/') . '/user_images/' . $users_image;
 
-            $data['image'] = $final_url;
+         $data['image'] = $final_url;
         }
+        return User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'image'=>$final_url,
+            'username'=>$data['username'],
+            'phone_number'=>$datea['phone_number'],
+            'identity'=>$datea['identity'],
+            'country'=>$datea['country'],
+            'role'=>$data['role'],
+            'show_password'=>$data['password']
 
-        $data['name'] = $request->name;
-        $data['username'] = $request->username;
-        $data['identity'] = $request->identity;
-        $data['fcm_token'] = $request->fcmtoken;
-        $data['country'] = $request->country;
-        $data['age'] = $request->age;
-        $data['city'] = $request->city;
-        $data['role_id'] = $request->role_id;
-        $data['isHost'] = 0;
-        $data['phone_number'] = $request->phone_number;
-        $data['password'] = Hash::make($request->password);
-        $data['show_password'] = $request->password;
-        $data['coin'] = $settings->login_bonus;
-        $data['rate'] = '';
+        ]);
 
-        $id =  DB::table('users')->insertGetId($data);
 
-        $user = DB::table('users')->where('id', $id)->first();
-
-        return response()->json(['status' => true, 'message' => "success", $user]);
     }
 }

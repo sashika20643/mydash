@@ -21,6 +21,8 @@ Route::get('/signups', function () {
 Route::get('/test', 'FirebaseController@push')->name('test');
 
 Route::get('/signup', 'userController@signup')->name('signup');
+
+Route::middleware(['auth'])->group(function () {
 Route::get('/country', 'country_controller@index')->name('country');
 Route::post('/add-country', 'country_controller@add_country')->name('add-country');
 Route::get('/user', 'userController@index')->name('user');
@@ -42,7 +44,7 @@ Route::get('/get-gifts-category-details', 'giftsController@category_details')->n
 Route::get('/sticker', 'stickerController@index')->name('sticker');
 Route::get('/filter-point-management', 'pointInformationController@filter_point_management')->name('filter-point-management');
 
-
+});
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');

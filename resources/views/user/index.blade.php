@@ -138,14 +138,18 @@
                                                 </td>
 +
                                                 <td>
-                                                        <a href="{{ url('/') }}/api/user/push_notification/{{ $value["uid"] }}"
-                                                            type="button" name="push_notification" id="push_notification"
-                                                            class="btn btn-sm btn-primary">Push Notification</a>
+                                                        <button
+                                                            type="button" name="push_notification" id="push_notification" onclick="showrate(`{{ $value['uid']}}`);"
+                                                            class="btn btn-sm btn-primary">Push Notification</button>
+
                                                 </td>
                                                 <td>
                                                     <label class="switch">
                                                         @if($status[$i]==1)
                                                         <input type="checkbox" name="isBlock" id="isBlock" checked="true"
+                                                        value="{{ $value["uid"] }}" >
+                                                        @elseif($status[$i]==1)
+                                                        <input type="checkbox" name="isBlock" id="isBlock" disabled
                                                         value="{{ $value["uid"] }}" >
                                                         @else
                                                         <input type="checkbox" name="isBlock" id="isBlock"
@@ -265,59 +269,73 @@
 
     </div>
 
-    {{-- <div class="pt-3" style="position: absolute;flex-direction:column;    transition-duration: 2s;
+    <div class="pt-3" style="position: absolute;flex-direction:column;    transition-duration: 2s;
     transition-timing-function: linear;
-    transition-delay: .3s;width:100vw;height:100vh;top:0;left:0;background-color:rgba(0, 0, 0, 0.8);align-items:center;justify-content:center;    " id="divcont" >
+    transition-delay: .3s;width:100vw;height:100vh;top:0;left:0;background-color:rgba(0, 0, 0, 0.8);align-items:center;justify-content:center;display:none    " id="divcont" >
 
     <div style="display:flex;align-items:center;justify-content:center;" >
         <form action="" method="POST" id="myDiv" >
             @csrf
-            <h3 class="text-center" >Input Rate</h3>
+            <h3 class="text-center" >Notification</h3>
     <input type="text" id="myInput" style="display: none" name="id">
     <div class="form-group">
         <label for="exampleInputEmail1">Notification Title</label>
-        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="title">
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="title" placeholder="title">
       </div>
       <div class="form-group">
         <label for="exampleInputEmail1">Notification body</label>
-        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="body">
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="body" placeholder="body">
       </div>
-            <button type="submit" class="btn btn-success"> Set </button>
+            <button type="submit" class="btn btn-success"> Send </button>
             </form>
-    </div> --}}
+    </div>
 
     </div>
-{{--
+
     <script>
         // Get the div element
         const myDiv = document.getElementById("myDiv");
-         const rate = document.getElementById("push_notification");
+         const  pushButtons=document.querySelectorAll('button[name="push_notification"]');
 
         const divcont = document.getElementById("divcont");
+
 
 
         // Add a click event listener to the document
         document.addEventListener("click", (event) => {
           // Check if the clicked element is inside the div
-          if (!myDiv.contains(event.target) && !rate.contains(event.target)) {
+
+          var clickedButton = event.target;
+  var isPushButton = false;
+  for (var i = 0; i < pushButtons.length; i++) {
+    if (pushButtons[i] === clickedButton) {
+      isPushButton = true;
+      break;
+    }
+  }
+          if (!myDiv.contains(event.target) && !isPushButton) {
             // If not, hide the div
             divcont.style.display = "none";
           }
+
         });
 
         function showrate(id){
 
-            myDiv.setAttribute("action", "{{ url('/') }}/api/user/push_notification/{{ $value["uid"] }}");
+            // console.log(id);
+            myDiv.setAttribute("action", "{{ url('/') }}/api/user/push_notification/"+id);
+
             const myInput = document.getElementById("myInput");
 
     // Set the value of the input field
     myInput.value = id;
+
     divcont.style.display = "flex";
 
 
 
         }
-      </script> --}}
+      </script>
     <script>
         $("#add_country").click(function() {
             $("#exampleModal").modal('show');
